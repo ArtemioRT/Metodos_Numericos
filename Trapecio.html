@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trapecio</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Plotly JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding-top: 56px;
+            background-color: #f4f4f9;
+        }
+        h1, h2, h3 {
+            color: #007bff;
+            text-align: center;
+        }
+        .result {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #28a745;
+            text-align: center;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .section, .step, .results-detail {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .section h3, .results-detail h3 {
+            color: #007bff;
+        }
+        .results-detail {
+            border-left: 5px solid #007bff;
+        }
+        .results-detail ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        #plotly_chart {
+            width: 100%;
+            height: 500px;
+            margin-top: 20px;
+        }
+        .table-custom thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #e2e2e2;
+        }
+        .navbar {
+            background-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .navbar-brand, .nav-link {
+            color: #ffffff !important;
+            transition: color 0.3s ease;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: #f8f9fa !important;
+        }
+        .nav-item {
+            margin-right: 10px;
+        }
+        .nav-item:last-child {
+            margin-right: 0;
+        }
+        .navbar-nav {
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        #scrollTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            z-index: 99;
+            border: none;
+            outline: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        #scrollTopBtn:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+        #scrollTopBtn.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Métodos Numéricos</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="Index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="Romberg.html">Romberg</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Trapecio.html">Trapecio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="DerivacionNumerica.html">Derivación Numérica</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Euler.html">Euler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Simpson13.html">Simpson 1/3</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Simpson38.html">Simpson 3/8</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="my-4">Cálculo de Calor usando la Regla del Trapecio</h1>
+
+        <div class="section">
+            <h2>Descripción del Problema</h2>
+            <p>
+                Calcule la cantidad de calor requerida para elevar la temperatura de 1500 gramos de un material desde -150 °C a 50 °C. 
+                Use la regla del trapecio para sus cálculos, con un valor de incremento de temperatura (ΔT) de 50 °C.
+            </p>
+            <p>
+                Para realizar el cálculo, se proporciona la siguiente tabla de calor específico en función de la temperatura:
+            </p>
+        </div>
+
+        <div class="step">
+            <h3>Paso a Paso del Procedimiento</h3>
+            <ol>
+                <li><strong>Obtener los datos:</strong> Recopila los datos de calor específico y las temperaturas correspondientes.</li>
+                <li><strong>Definir el intervalo:</strong> El intervalo de temperatura es de -100 °C a 50 °C, con un incremento de 50 °C.</li>
+                <li><strong>Filtrar datos:</strong> Filtra los datos de acuerdo al rango dado en el problema. Utiliza los siguientes datos:
+                    <ul>
+                        <li>-100 °C: 0.11904 cal/g°C</li>
+                        <li>-50 °C: 0.12486 cal/g°C</li>
+                        <li>0 °C: 0.13200 cal/g°C</li>
+                        <li>50 °C: 0.14046 cal/g°C</li>
+                    </ul>
+                </li>
+                <li><strong>Aplicar la Regla del Trapecio:</strong> Utiliza la fórmula de la regla del trapecio para calcular la integral de la función de calor específico:
+                    <ul>
+                        <li><strong>Fórmula:</strong> 
+                            <code>Q = (ΔT / 2) * (f(T0) + 2 * (sumatoria de f(Ti) donde 1 <= i <= n-1) + f(Tn))</code>
+                            donde:
+                            <ul>
+                                <li><code>ΔT</code> = 50 °C (diferencia entre cada par de temperaturas)</li>
+                                <li><code>T0</code> = Temperatura inicial (-100 °C)</li>
+                                <li><code>Tn</code> = Temperatura final (50 °C)</li>
+                                <li><code>f(Ti)</code> = Calor específico en las temperaturas intermedias</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Multiplicar por la masa:</strong> Multiplica el resultado de la integral por la masa del material para obtener la cantidad total de calor:
+                    <ul>
+                        <li><strong>Fórmula:</strong> 
+                            <code>Q_total = Q * masa</code>
+                            donde:
+                            <ul>
+                                <li><code>Q</code> = Resultado de la integral calculada</li>
+                                <li><code>masa</code> = 1500 gramos</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Mostrar resultados:</strong> Presenta el resultado final en calorías.</li>
+            </ol>
+        </div>
+        <br>
+        <h2>Datos de Calor Específico</h2>
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Temperatura (°C)</th>
+                    <th>Calor Específico (cal/g°C)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>-100</td><td>0.11904</td></tr>
+                <tr><td>-50</td><td>0.12486</td></tr>
+                <tr><td>0</td><td>0.13200</td></tr>
+                <tr><td>50</td><td>0.14046</td></tr>
+                <tr><td>100</td><td>0.15024</td></tr>
+                <tr><td>150</td><td>0.16134</td></tr>
+                <tr><td>200</td><td>0.17376</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Tabla de Datos Usados para el Cálculo</h2>
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Temperatura (°C)</th>
+                    <th>Calor Específico (cal/g°C)</th>
+                </tr>
+            </thead>
+            <tbody id="data-table">
+                <!-- La tabla se llenará dinámicamente con JavaScript -->
+            </tbody>
+        </table>
+
+        <div class="section">
+            <h2>Configuración de Cálculo</h2>
+            <div class="form-group">
+                <label for="mass">Masa (gramos):</label>
+                <input type="number" id="mass" class="form-control" value="1500" step="0.01">
+            </div>
+            <button class="btn btn-custom" onclick="calculate()">Calcular</button>
+        </div>
+
+        <div class="results-detail">
+            <h3>Resultados</h3>
+            <p id="result" class="result">Esperando resultados...</p>
+        </div>
+
+        <div class="section">
+            <h2>Visualización de Trapecios</h2>
+            <div id="plotly_chart"></div>
+        </div>
+
+        <div class="section">
+            <h2>Desglose del Procedimiento</h2>
+            <div id="procedure-breakdown">
+                <p>Paso 1: Definición de variables</p>
+                <p>
+                    Masa (m) = <span id="mass-value"></span> g<br>
+                    ΔT = 50 °C (intervalo entre temperaturas)
+                </p>
+
+                <p>Paso 2: Cálculo de la integral usando la Regla del Trapecio</p>
+                <p>Fórmula general:</p>
+                <p>Q = (ΔT / 2) * [f(T₀) + 2f(T₁) + 2f(T₂) + ... + 2f(Tₙ₋₁) + f(Tₙ)]</p>
+                
+                <div id="trapezoid-steps"></div>
+
+                <p>Paso 3: Cálculo del calor total</p>
+                <p>Fórmula: Q_total = Q * m</p>
+                <p id="total-heat-calc"></p>
+
+                <p>Resultado Final</p>
+                <p id="final-result"></p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Conclusión</h2>
+            <p>La regla del trapecio es un método de integración numérica que aproxima el área bajo una curva dividiendo el intervalo en segmentos y aproximando cada segmento con un trapecio. La integral de la función es la suma de las áreas de todos los trapecios. En este cálculo, utilizamos temperaturas específicas y calor específico para aproximar el calor total necesario.</p>
+        </div>
+
+    </div>
+    <br><br>
+
+    <button onclick="topFunction()" id="scrollTopBtn" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+       function calculate() {
+            const data = [
+                { temperature: -100, specificHeat: 0.11904 },
+                { temperature: -50, specificHeat: 0.12486 },
+                { temperature: 0, specificHeat: 0.13200 },
+                { temperature: 50, specificHeat: 0.14046 }
+            ];
+
+            // Obtener la masa desde el input
+            const mass = parseFloat(document.getElementById('mass').value);
+
+            // Calcular el calor usando la regla del trapecio
+            let Q = 0;
+            const n = data.length - 1;
+            for (let i = 0; i < n; i++) {
+                const h = data[i + 1].temperature - data[i].temperature;
+                Q += (h / 2) * (data[i].specificHeat + data[i + 1].specificHeat);
+            }
+            const totalHeat = Q * mass;
+
+            // Mostrar el resultado
+            document.getElementById('result').textContent = totalHeat.toFixed(2) + ' calorías';
+
+            // Actualizar la tabla de datos
+            const table = document.getElementById('data-table');
+            table.innerHTML = '';
+            data.forEach(row => {
+                table.innerHTML += `
+                    <tr>
+                        <td>${row.temperature}</td>
+                        <td>${row.specificHeat}</td>
+                    </tr>
+                `;
+            });
+
+            // Actualizar el desglose del procedimiento
+            document.getElementById('mass-value').textContent = mass;
+
+            let trapezoidSteps = '';
+            let sum = data[0].specificHeat + data[data.length - 1].specificHeat;
+            for (let i = 1; i < data.length - 1; i++) {
+                sum += 2 * data[i].specificHeat;
+                trapezoidSteps += `
+                    <p>T${i} (${data[i].temperature}°C): 2 * ${data[i].specificHeat.toFixed(5)} = ${(2 * data[i].specificHeat).toFixed(5)}</p>
+                `;
+            }
+
+            document.getElementById('trapezoid-steps').innerHTML = `
+                <p>T₀ (${data[0].temperature}°C): ${data[0].specificHeat.toFixed(5)}</p>
+                ${trapezoidSteps}
+                <p>Tₙ (${data[data.length - 1].temperature}°C): ${data[data.length - 1].specificHeat.toFixed(5)}</p>
+                <p>Suma total = ${sum.toFixed(5)}</p>
+                <p>Q = (50 / 2) * ${sum.toFixed(5)} = ${Q.toFixed(5)} cal/g</p>
+            `;
+
+            document.getElementById('total-heat-calc').innerHTML = `
+                Q_total = ${Q.toFixed(5)} * ${mass} = ${totalHeat.toFixed(2)} calorías
+            `;
+
+            document.getElementById('final-result').textContent = `Calor total requerido: ${totalHeat.toFixed(2)} calorías`;
+
+            // Graficar los datos con Plotly
+            const x = data.map(row => row.temperature);
+            const y = data.map(row => row.specificHeat);
+
+            const trace1 = {
+                x: x,
+                y: y,
+                mode: 'lines+markers',
+                name: 'Curva del Calor Específico',
+                type: 'scatter'
+            };
+
+            const trace2 = {
+                x: [...x, x[x.length - 1]],
+                y: [...y, y[y.length - 1]],
+                mode: 'lines',
+                name: 'Trapecios',
+                line: { color: 'rgba(255,0,0,0.5)' }
+            };
+
+            const dataPlot = [trace1, trace2];
+
+            const layout = {
+                title: 'Visualización de Trapecios',
+                xaxis: { title: 'Temperatura (°C)' },
+                yaxis: { title: 'Calor Específico (cal/g°C)' },
+                shapes: data.slice(0, -1).map((row, i) => ({
+                    type: 'rect',
+                    x0: row.temperature,
+                    x1: data[i + 1].temperature,
+                    y0: 0,
+                    y1: Math.max(row.specificHeat, data[i + 1].specificHeat),
+                    fillcolor: 'rgba(255,0,0,0.2)',
+                    line: { color: 'rgba(255,0,0,0.5)' }
+                }))
+            };
+
+            Plotly.newPlot('plotly_chart', dataPlot, layout);
+        }
+
+        // Ejecutar el cálculo inicial al cargar la página
+        window.onload = calculate;
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                document.getElementById("scrollTopBtn").classList.add("show");
+            } else {
+                document.getElementById("scrollTopBtn").classList.remove("show");
+            }
+        }
+
+        function topFunction() {
+            const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            if (currentScroll > 0) {
+                window.requestAnimationFrame(topFunction);
+                window.scrollTo(0, currentScroll - currentScroll / 8);
+            }
+        }
+    </script>
+</body>
+</html>

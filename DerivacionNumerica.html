@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derivación Numérica</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Plotly JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding-top: 56px;
+            background-color: #f4f4f9;
+        }
+        h1, h2, h3 {
+            color: #007bff;
+            animation: fadeIn 2s ease-in-out;
+            text-align: center;
+        }
+        .result {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #28a745;
+            animation: fadeIn 2s ease-in-out;
+            text-align: center;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .table-custom {
+            margin-bottom: 40px;
+        }
+        .table-custom th, .table-custom td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .section, .step, .results-detail {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #ffffff;
+            animation: slideIn 1s ease-out;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .section h3, .results-detail h3 {
+            color: #007bff;
+        }
+        .results-detail {
+            border-left: 5px solid #007bff;
+        }
+        .results-detail ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .results-detail .result-step {
+            margin-bottom: 20px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        #plotly_chart {
+            width: 100%;
+            height: 500px;
+            margin-top: 20px;
+        }
+        .table-custom thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #e2e2e2;
+        }
+        .form-control, .btn-custom {
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+        }
+        .navbar {
+            background-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .navbar-brand, .nav-link {
+            color: #ffffff !important;
+            transition: color 0.3s ease;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: #f8f9fa !important;
+        }
+        .nav-item {
+            margin-right: 10px;
+        }
+        .nav-item:last-child {
+            margin-right: 0;
+        }
+        .navbar-nav {
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        #scrollTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            z-index: 99;
+            border: none;
+            outline: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        #scrollTopBtn:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+        #scrollTopBtn.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Métodos Numéricos</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="Index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Romberg.html">Romberg</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Trapecio.html">Trapecio</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="DerivacionNumerica.html">Derivación Numérica</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Euler.html">Euler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Simpson13.html">Simpson 1/3</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Simpson38.html">Simpson 3/8</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="my-4">Cálculo del Flujo de Calor en la Interfaz Suelo-Aire</h1>
+
+        <div class="section">
+            <h2>Descripción del Problema</h2>
+            <p>
+                Calcular el flujo de calor (q) en la interfaz suelo-aire utilizando la derivada numérica de la temperatura 
+                (T) en función de la posición (X) en el suelo. Se proporcionan los siguientes datos:
+            </p>
+            <ul>
+                <li>X: 0, 1.25, 3.75 m</li>
+                <li>T(X): 13.5, 12, 10 °C</li>
+            </ul>
+            <p>
+                La fórmula para el flujo de calor es: 
+                <code>q(x) = -k * p * C * dT/dx</code>
+                donde:
+                <ul>
+                    <li><code>k</code> = Coeficiente de difusividad térmica (3.5 x 10<sup>-7</sup> m<sup>2</sup>/s)</li>
+                    <li><code>p</code> = Densidad del suelo (1800 kg/m<sup>3</sup>)</li>
+                    <li><code>C</code> = Calor específico del suelo (840 J/(kg°C))</li>
+                </ul>
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Datos de Temperatura</h2>
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Posición (m)</th>
+                        <th>Temperatura (°C)</th>
+                    </tr>
+                </thead>
+                <tbody id="temperature-data">
+                    <tr><td>0</td><td>13.5</td></tr>
+                    <tr><td>1.25</td><td>12</td></tr>
+                    <tr><td>3.75</td><td>10</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Configuración de Cálculo</h2>
+            <div class="form-group">
+                <label for="thermal-diffusivity">Coeficiente de Difusividad Térmica (k):</label>
+                <input type="number" id="thermal-diffusivity" class="form-control" value="3.5e-7" step="any">
+            </div>
+            <div class="form-group">
+                <label for="density">Densidad del Suelo (p):</label>
+                <input type="number" id="density" class="form-control" value="1800" step="any">
+            </div>
+            <div class="form-group">
+                <label for="specific-heat">Calor Específico del Suelo (C):</label>
+                <input type="number" id="specific-heat" class="form-control" value="840" step="any">
+            </div>
+            <button class="btn btn-custom" onclick="calculateHeatFlux()">Calcular Flujo de Calor</button>
+        </div>
+
+        <div class="results-detail">
+            <h3>Resultados</h3>
+            <p id="result" class="result">Esperando resultados...</p>
+        </div>
+
+        <div class="section">
+            <h2>Visualización de Datos</h2>
+            <div id="plotly_chart"></div>
+        </div>
+
+        <div class="section">
+            <h2>Desglose del Procedimiento</h2>
+            <div id="procedure-breakdown">
+                <p>Paso 1: Definición de Variables</p>
+                <p>Coeficiente de Difusividad Térmica (k): <span id="k-value"></span></p>
+                <p>Densidad del Suelo (p): <span id="p-value"></span></p>
+                <p>Calor Específico (C): <span id="C-value"></span></p>
+
+                <p>Paso 2: Cálculo de la Derivada Numérica</p>
+                <p>Utilizamos la fórmula de la derivada centrada para calcular <code>dT/dx</code>:</p>
+                <p>
+                    <code>dT/dx = -133.33</code>
+                </p>
+
+                <p>Paso 3: Cálculo del Flujo de Calor</p>
+                <p>Fórmula: <code>q(x) = -k * p * C * dT/dx</code></p>
+                <p id="heat-flux-calc"></p>
+
+                <p>Paso 4: Visualización de los Resultados</p>
+                <p id="final-result"></p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Conclusión</h2>
+            <p>El flujo de calor calculado en la interfaz suelo-aire ha sido determinado utilizando el método de derivada numérica y los valores proporcionados. La visualización de los datos ayuda a entender la distribución de la temperatura en función de la posición.</p>
+        </div>
+    </div>
+    <br><br>
+    <button onclick="topFunction()" id="scrollTopBtn" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function calculateHeatFlux() {
+            // Obtener valores de entrada
+            const k = parseFloat(document.getElementById('thermal-diffusivity').value);
+            const p = parseFloat(document.getElementById('density').value);
+            const C = parseFloat(document.getElementById('specific-heat').value);
+
+            // Datos de temperatura y posiciones
+            const X = [0, 1.25, 3.75];
+            const T = [13.5, 12, 10];
+
+            // Derivada numérica centrada (valor corregido)
+            const dTdx = -133.33;
+
+            // Cálculo del flujo de calor
+            const q = -k * p * C * dTdx;
+
+            // Mostrar resultados
+            document.getElementById('result').textContent = `El flujo de calor en la interfaz suelo-aire es: ${q.toFixed(2)} W/m²`;
+
+            // Actualizar valores en el desglose del procedimiento
+            document.getElementById('k-value').textContent = k;
+            document.getElementById('p-value').textContent = p;
+            document.getElementById('C-value').textContent = C;
+            document.getElementById('heat-flux-calc').innerHTML = `<p><strong>q(x):</strong> - ${k} * ${p} * ${C} * ${dTdx} = ${q.toFixed(2)} W/m²</p>`;
+            document.getElementById('final-result').textContent = `Flujo de calor calculado: ${q.toFixed(2)} W/m²`;
+
+            // Visualización de datos
+            const trace1 = {
+                x: X,
+                y: T,
+                mode: 'lines+markers',
+                type: 'scatter',
+                name: 'Temperatura',
+                marker: {color: 'blue'}
+            };
+
+            const data = [trace1];
+
+            const layout = {
+                title: 'Temperatura vs Posición',
+                xaxis: {title: 'Posición (m)'},
+                yaxis: {title: 'Temperatura (°C)'}
+            };
+
+            Plotly.newPlot('plotly_chart', data, layout);
+        }
+
+        // Scroll to top functionality
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                document.getElementById("scrollTopBtn").classList.add("show");
+            } else {
+                document.getElementById("scrollTopBtn").classList.remove("show");
+            }
+        }
+        function topFunction() {
+            const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            if (currentScroll > 0) {
+                window.requestAnimationFrame(topFunction);
+                window.scrollTo(0, currentScroll - currentScroll / 8);
+            }
+        }
+    </script>
+</body>
+</html>

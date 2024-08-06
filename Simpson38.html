@@ -1,0 +1,356 @@
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Simpson 3/8</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <!-- Plotly JS -->
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding-top: 56px;
+                background-color: #f4f4f9;
+            }
+            h1, h2, h3 {
+                color: #007bff;
+                animation: fadeIn 2s ease-in-out;
+                text-align: center;
+            }
+            .result {
+                font-size: 1.5em;
+                font-weight: bold;
+                color: #28a745;
+                animation: fadeIn 2s ease-in-out;
+                text-align: center;
+            }
+            .form-group label {
+                font-weight: bold;
+            }
+            .btn-custom {
+                background-color: #007bff;
+                color: white;
+                transition: background-color 0.3s ease;
+            }
+            .btn-custom:hover {
+                background-color: #0056b3;
+            }
+            .table-custom {
+                margin-bottom: 40px;
+            }
+            .table-custom th, .table-custom td {
+                vertical-align: middle;
+                text-align: center;
+            }
+            .section, .step, .results-detail {
+                margin-top: 20px;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                background-color: #ffffff;
+                animation: slideIn 1s ease-out;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+            .section h3, .results-detail h3 {
+                color: #007bff;
+            }
+            .results-detail {
+                border-left: 5px solid #007bff;
+            }
+            .results-detail ol {
+                margin: 0;
+                padding-left: 20px;
+            }
+            .results-detail .result-step {
+                margin-bottom: 20px;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideIn {
+                from { transform: translateX(-100%); }
+                to { transform: translateX(0); }
+            }
+            #plotly_chart {
+                width: 100%;
+                height: 500px;
+                margin-top: 20px;
+            }
+            .table-custom thead th {
+                background-color: #007bff;
+                color: white;
+            }
+            .table-custom tbody tr:nth-child(odd) {
+                background-color: #f9f9f9;
+            }
+            .table-custom tbody tr:hover {
+                background-color: #e2e2e2;
+            }
+            .form-control, .btn-custom {
+                transition: all 0.3s ease;
+            }
+            .form-control:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+            }
+            .navbar {
+                background-color: #007bff;
+                box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            }
+            .navbar-brand, .nav-link {
+                color: #ffffff !important;
+                transition: color 0.3s ease;
+            }
+            .navbar-brand:hover, .nav-link:hover {
+                color: #f8f9fa !important;
+            }
+            .nav-item {
+                margin-right: 10px;
+            }
+            .nav-item:last-child {
+                margin-right: 0;
+            }
+            .navbar-nav {
+                animation: slideDown 0.5s ease-out;
+            }
+            @keyframes slideDown {
+                from { transform: translateY(-100%); }
+                to { transform: translateY(0); }
+            }
+            #scrollTopBtn {
+                display: none;
+                position: fixed;
+                bottom: 20px;
+                right: 30px;
+                z-index: 99;
+                border: none;
+                outline: none;
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+                padding: 15px;
+                border-radius: 50%;
+                font-size: 18px;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            }
+            #scrollTopBtn:hover {
+                background-color: #0056b3;
+                transform: scale(1.1);
+            }
+            #scrollTopBtn.show {
+                display: block;
+                animation: fadeIn 0.3s;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">Métodos Numéricos</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="Index.html">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Romberg.html">Romberg</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Trapecio.html">Trapecio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="DerivacionNumerica.html">Derivación Numérica</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Euler.html">Euler</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Simpson13.html">Simpson 1/3</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="Simpson38.html">Simpson 3/8</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <h1 class="my-4">Método de Simpson 3/8 - Cálculo de Datos Transferidos</h1>
+
+            <div class="section">
+                <h2>Descripción del Problema</h2>
+                <p>
+                    Un ingeniero de redes desea calcular la cantidad total de datos transferidos a través de una red durante un período de tiempo. Se ha registrado la tasa de transferencia de datos (en MB/s) en intervalos regulares de tiempo. Los datos obtenidos son los siguientes:
+                </p>
+                <ul>
+                    <li>Intervalo de tiempo entre cada medición (h): 1 segundo</li>
+                    <li>Tasa de transferencia en cada segundo (en MB/s): 10, 12, 15, 13, 10, 8, 7, 6, 5</li>
+                </ul>
+                <p>Usando el método de Simpson 3/8, se debe calcular la cantidad total de datos transferidos en MB.</p>
+            </div>
+
+            <div class="section">
+                <h2>Paso a Paso del Procedimiento</h2>
+                <ol>
+                    <li>Definir la función de la tasa de transferencia de datos.</li>
+                    <li>Calcular el valor de <strong>h:</strong> Intervalo de tiempo entre cada medición (1 segundo).</li>
+                    <li>Evaluar la tasa de transferencia en los puntos de la partición.</li>
+                    <li>Aplicar la regla de Simpson 3/8 para calcular la cantidad de datos transferidos:
+                        <div class="formula">
+                            \[
+                            D \approx \frac{3h}{8} \left[ f(x_0) + 3(f(x_1) + f(x_2)) + 2f(x_3) + 3(f(x_4) + f(x_5)) + 2f(x_6) + 3(f(x_7) + f(x_8)) + f(x_9) \right]
+                            \]
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>Configuración de Cálculo</h2>
+                <p>Valores utilizados en el cálculo:</p>
+                <ul>
+                    <li><strong>h:</strong> 1 segundo</li>
+                    <li><strong>Tasa de transferencia:</strong> [10, 12, 15, 13, 10, 8, 7, 6, 5] MB/s</li>
+                </ul>
+            </div>
+
+            <div class="section results-detail">
+                <h3>Resultados</h3>
+                <div class="result-step">
+                    <p><strong>Cantidad Total de Datos Transferidos:</strong> <span id="data-result">81.75</span> MB</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Desglose del Procedimiento</h2>
+                <ol>
+                    <li>Se definen los intervalos de tiempo entre las mediciones \( h = 1 \) segundo.</li>
+                    <li>Se identifican las tasas de transferencia en los puntos de la partición, dadas por [10, 12, 15, 13, 10, 8, 7, 6, 5] MB/s.</li>
+                    <li>Se aplica la fórmula de Simpson 3/8:
+                        \[
+                        D \approx \frac{3h}{8} \left[ f(x_0) + 3(f(x_1) + f(x_2)) + 2f(x_3) + 3(f(x_4) + f(x_5)) + 2f(x_6) + 3(f(x_7) + f(x_8)) + f(x_9) \right]
+                        \]
+                        Donde:
+                        <ul>
+                            <li>\( f(x_0) = 10 \)</li>
+                            <li>\( f(x_1) = 12 \)</li>
+                            <li>\( f(x_2) = 15 \)</li>
+                            <li>\( f(x_3) = 13 \)</li>
+                            <li>\( f(x_4) = 10 \)</li>
+                            <li>\( f(x_5) = 8 \)</li>
+                            <li>\( f(x_6) = 7 \)</li>
+                            <li>\( f(x_7) = 6 \)</li>
+                            <li>\( f(x_8) = 5 \)</li>
+                        </ul>
+                    </li>
+                    <li>Se calcula la cantidad total de datos transferidos:
+                        \[
+                        D \approx \frac{3 \cdot 1}{8} \left[ 10 + 3(12 + 15) + 2(13) + 3(10 + 8) + 2(7) + 3(6 + 5) \right]
+                        \]
+                        \[
+                        D \approx \frac{3}{8} (10 + 81 + 26 + 54 + 14 + 33)
+                        \]
+                        \[
+                        D \approx \frac{3}{8} (218)
+                        \]
+                        \[
+                        D \approx 81.75 \text{ MB}
+                        \]
+                    </li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>Visualización de la Tasa de Transferencia</h2>
+                <div id="plotly_chart"></div>
+            </div>
+
+            <div class="section">
+                <h2>Conclusión</h2>
+                <p>Se ha calculado que la cantidad total de datos transferidos a través de la red durante el período dado es de aproximadamente <strong>81.75 MB</strong>. Este cálculo es esencial para el análisis del rendimiento de la red y la planificación de la capacidad.</p>
+            </div>
+        </div>
+        <br><br>
+        <!-- Scroll to top button -->
+        <button onclick="topFunction()" id="scrollTopBtn" title="Volver arriba">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+
+        <!-- Bootstrap JS, Popper.js, and jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        <script>
+            function calculateSimpson() {
+                const h = 1;
+                const rates = [10, 12, 15, 13, 10, 8, 7, 6, 5];
+                const n = rates.length - 1;
+
+                let sum = rates[0] + rates[n];
+                for (let i = 1; i < n; i += 3) {
+                    sum += 3 * (rates[i] + rates[i + 1]);
+                }
+                for (let i = 3; i < n; i += 3) {
+                    sum += 2 * rates[i];
+                }
+
+                const data = (3 * h / 8) * sum;
+                document.getElementById('data-result').innerText = data.toFixed(2);
+
+                plotRates(rates);
+            }
+
+            function plotRates(rates) {
+                const x = Array.from({ length: rates.length }, (_, i) => i * 1);
+                const data = [{ x, y: rates, type: 'scatter', mode: 'lines+markers', line: { shape: 'spline' } }];
+                Plotly.newPlot('plotly_chart', data, {
+                    title: 'Tasa de Transferencia de Datos',
+                    xaxis: { title: 'Tiempo (s)' },
+                    yaxis: { title: 'Tasa de Transferencia (MB/s)' }
+                });
+            }
+
+            // Llamar a la función para calcular y mostrar los resultados al cargar la página
+            window.onload = calculateSimpson;
+
+            // Scroll to top functionality
+            window.onscroll = function() {scrollFunction()};
+
+            function scrollFunction() {
+                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                    document.getElementById("scrollTopBtn").classList.add("show");
+                } else {
+                    document.getElementById("scrollTopBtn").classList.remove("show");
+                }
+            }
+
+            // Función para volver al inicio de la página con animación suave
+            function topFunction() {
+                // Obtener la posición actual de scroll
+                const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+
+                // Si no estamos en la parte superior, llamar a la función de animación
+                if (currentScroll > 0) {
+                    window.requestAnimationFrame(topFunction);
+                    // Mover hacia arriba con una animación suave
+                    window.scrollTo(0, currentScroll - currentScroll / 8);
+                }
+            }
+        </script>
+    </body>
+    </html>
