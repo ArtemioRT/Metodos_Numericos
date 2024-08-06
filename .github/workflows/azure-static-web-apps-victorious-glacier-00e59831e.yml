@@ -26,7 +26,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WONDERFU}}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/index.html" # Ruta al código fuente de tu aplicación
+          app_location: "/index" # Ruta al código fuente de tu aplicación
           skip_deploy_on_missing_secrets: true
 
   close_pull_request_job:
